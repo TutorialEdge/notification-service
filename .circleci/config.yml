@@ -1,0 +1,84 @@
+version: 2.1
+
+orbs: 
+  go: circleci/go@1.7.1
+  golangci-lint: timakin/golangci-lint@0.1.1
+  docker: circleci/docker@2.1.4
+  codecov: codecov/codecov@3
+
+jobs:
+  build-service:
+    docker:
+      - image: cimg/go:1.19.3
+    steps:
+      - checkout
+      - run:
+          name: "Building the code"
+          command: go build ./...
+  
+  race-check-service:
+    docker:
+      - image: cimg/go:1.19.3
+    steps:
+      - checkout
+      - go/install
+      - run:
+          name: "Test Service"
+          command: |
+            go mod vendor
+            go test -race ./...
+  
+  benchmark-service:
+    docker:
+      - image: cimg/go:1.19.3
+    steps:
+      - checkout
+      - go/install
+      - run:
+          name: "Test Service"
+          command: |
+            go mod vendor
+            go test -bench=. ./...
+  
+  test-service:
+    docker:
+      - image: cimg/go:1.19.3
+    steps:
+      - checkout
+      - go/install
+      - run:
+          name: "Test Service"
+          command: |
+            go mod vendor
+            go test ./... -v
+
+  lint-service:
+    docker: 
+      - image: golangci/golangci-lint
+    steps:
+      - checkout
+      - run:
+          name: "lint Service"
+          command: |
+            golangci-lint run --timeout 120s
+
+  deploy-service:
+    docker:
+      - image: cimg/go:1.19.3
+    steps:
+      - checkout
+      - run:
+          name: "Fly Deploy"
+          command: |
+            curl -L https://fly.io/install.sh | sh
+            /home/circleci/.fly/bin/flyctl deploy
+
+workflows:
+  main:
+    jobs:
+      - build-service
+      - test-service
+      - lint-service
+      - race-check-service
+      - benchmark-service
+      - deploy-service
