@@ -3,15 +3,19 @@ package api
 import (
 	"net/http"
 
+	"github.com/TutorialEdge/notification-service/internal/notification"
 	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
-	router *gin.Engine
+	router              *gin.Engine
+	notificationService notification.Notifier
 }
 
-func New() *Handler {
-	handler := &Handler{}
+func New(notifier notification.Notifier) *Handler {
+	handler := &Handler{
+		notificationService: notifier,
+	}
 	handler.setupRoutes()
 	return handler
 }

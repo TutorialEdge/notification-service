@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Subscribe - handles a new subscriber request
 func (h *Handler) Subscribe(c *gin.Context) {
 	// subscribes to a specific list
 	c.JSON(http.StatusOK, gin.H{"message": "subscribed"})
