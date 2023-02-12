@@ -12,6 +12,7 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 RUN apk add --no-cache git make musl-dev go
 COPY --from=builder /app/main .
+COPY --from=builder /app/migrations ./migrations
 # Configure Go
 ENV GOROOT /usr/lib/go
 ENV GOPATH /go

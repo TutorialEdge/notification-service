@@ -49,6 +49,21 @@ func (q *Queries) CreateNotification(ctx context.Context, arg CreateNotification
 	return i, err
 }
 
+const createSubscriber = `-- name: CreateSubscriber :one
+INSERT INTO subscribers (
+    email
+) VALUES (
+    $1
+) RETURNING subscriber_id, email, is_subscribed
+`
+
+func (q *Queries) CreateSubscriber(ctx context.Context, email string) (Subscriber, error) {
+	row := q.db.QueryRowContext(ctx, createSubscriber, email)
+	var i Subscriber
+	err := row.Scan(&i.SubscriberID, &i.Email, &i.IsSubscribed)
+	return i, err
+}
+
 const deleteList = `-- name: DeleteList :exec
 DELETE FROM list 
 WHERE list_id = $1
@@ -91,4 +106,27 @@ func (q *Queries) GetNotification(ctx context.Context, notificationID uuid.UUID)
 	var i Notification
 	err := row.Scan(&i.NotificationID, &i.NotificationName, &i.Html)
 	return i, err
+}
+
+const getSusbcriber = `-- name: GetSusbcriber :one
+SELECT subscriber_id, email, is_subscribed FROM subscribers
+WHERE subscriber_id = $1
+`
+
+func (q *Queries) GetSusbcriber(ctx context.Context, subscriberID uuid.UUID) (Subscriber, error) {
+	row := q.db.QueryRowContext(ctx, getSusbcriber, subscriberID)
+	var i Subscriber
+	err := row.Scan(&i.SubscriberID, &i.Email, &i.IsSubscribed)
+	return i, err
+}
+
+const unsubscribe = `-- name: Unsubscribe :exec
+UPDATE subscribers
+SET is_subscribed = 'f'
+WHERE email = $1
+`
+
+func (q *Queries) Unsubscribe(ctx context.Context, email string) error {
+	_, err := q.db.ExecContext(ctx, unsubscribe, email)
+	return err
 }

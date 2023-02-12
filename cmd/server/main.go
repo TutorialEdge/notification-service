@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"os"
 
+	_ "github.com/lib/pq"
+
 	"github.com/TutorialEdge/notification-service/internal/api"
 	"github.com/TutorialEdge/notification-service/internal/email"
+	"github.com/TutorialEdge/notification-service/internal/list"
 	"github.com/TutorialEdge/notification-service/internal/notification"
 	"github.com/TutorialEdge/notification-service/internal/store"
 	"github.com/TutorialEdge/notification-service/internal/subscriber"
@@ -30,12 +33,18 @@ func Run() error {
 		return fmt.Errorf("could not connect to database: %w", err)
 	}
 
+	err = store.MigrateDB(db)
+	if err != nil {
+		return err
+	}
+
 	serviceStore := store.New(db)
 	emailService := email.New()
 
+	listService := list.New()
 	subscriberService := subscriber.New(serviceStore)
 	notificationService := notification.New(serviceStore, emailService, subscriberService)
-	notificationAPI := api.New(*notificationService)
+	notificationAPI := api.New(*notificationService, *subscriberService, *listService)
 	if err := notificationAPI.Serve(); err != nil {
 		return err
 	}

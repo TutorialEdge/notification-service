@@ -3,18 +3,28 @@ package api
 import (
 	"net/http"
 
+	"github.com/TutorialEdge/notification-service/internal/list"
 	"github.com/TutorialEdge/notification-service/internal/notification"
+	"github.com/TutorialEdge/notification-service/internal/subscriber"
 	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
 	router              *gin.Engine
 	notificationService notification.Notifier
+	subService          subscriber.Service
+	listService         list.Service
 }
 
-func New(notifier notification.Notifier) *Handler {
+func New(
+	notifier notification.Notifier,
+	subService subscriber.Service,
+	listService list.Service,
+) *Handler {
 	handler := &Handler{
 		notificationService: notifier,
+		subService:          subService,
+		listService:         listService,
 	}
 	handler.setupRoutes()
 	return handler
@@ -33,6 +43,8 @@ func (h *Handler) setupRoutes() {
 
 	h.router.POST("/api/v1/notification", h.CreateNotification)
 	h.router.POST("/api/v1/notification/:notificationid", h.SendNotification)
+	h.router.GET("/api/v1/notification/:notificationid", h.GetNotification)
+	h.router.PUT("/api/v1/notification/:notificationid", h.UpdateNotification)
 
 	h.router.POST("/api/v1/subscribe", h.Subscribe)
 	h.router.GET("/api/v1/unsubscribe", h.Unsubscribe)

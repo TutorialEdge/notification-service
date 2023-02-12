@@ -22,7 +22,7 @@ type Notification struct {
 }
 
 type Subscriber struct {
-	SubscribedID uuid.UUID
+	SubscriberID uuid.UUID
 	Email        string
 	IsSubscribed sql.NullBool
 }
