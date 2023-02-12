@@ -21,7 +21,6 @@ jobs:
       - image: cimg/go:1.19.3
     steps:
       - checkout
-      - go/install
       - run:
           name: "Test Service"
           command: |
@@ -33,7 +32,6 @@ jobs:
       - image: cimg/go:1.19.3
     steps:
       - checkout
-      - go/install
       - run:
           name: "Test Service"
           command: |
@@ -45,7 +43,6 @@ jobs:
       - image: cimg/go:1.19.3
     steps:
       - checkout
-      - go/install
       - run:
           name: "Test Service"
           command: |
@@ -82,3 +79,5 @@ workflows:
       - race-check-service
       - benchmark-service
       - deploy-service
+
+# VS Code Extension Version: 1.5.1
