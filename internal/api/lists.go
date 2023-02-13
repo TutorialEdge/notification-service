@@ -8,6 +8,7 @@ import (
 )
 
 func (h *Handler) CreateList(c *gin.Context) {
+	h.log.Info(c.Request.Context(), "creating a new list")
 	var newList list.List
 	if err := c.BindJSON(&newList); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{

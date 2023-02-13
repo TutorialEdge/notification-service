@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"os"
 
 	_ "github.com/lib/pq"
 
+	"github.com/TutorialEdge/ctxlog"
 	"github.com/TutorialEdge/notification-service/internal/api"
 	"github.com/TutorialEdge/notification-service/internal/email"
 	"github.com/TutorialEdge/notification-service/internal/list"
@@ -16,7 +18,11 @@ import (
 )
 
 func Run() error {
-	fmt.Println("starting notification service")
+	ctx := context.Background()
+	log := ctxlog.New(
+		ctxlog.WithJSONFormat(),
+	)
+	log.Info(ctx, "starting notification service")
 
 	connectionString := fmt.Sprintf(
 		"host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
@@ -30,11 +36,13 @@ func Run() error {
 
 	db, err := sql.Open("postgres", connectionString)
 	if err != nil {
+		log.Error(ctx, err.Error())
 		return fmt.Errorf("could not connect to database: %w", err)
 	}
 
 	err = store.MigrateDB(db)
 	if err != nil {
+		log.Error(ctx, err.Error())
 		return err
 	}
 
@@ -43,9 +51,19 @@ func Run() error {
 
 	listService := list.New()
 	subscriberService := subscriber.New(serviceStore)
-	notificationService := notification.New(serviceStore, emailService, subscriberService)
-	notificationAPI := api.New(*notificationService, *subscriberService, *listService)
+	notificationService := notification.New(
+		serviceStore,
+		emailService,
+		subscriberService,
+	)
+	notificationAPI := api.New(
+		*notificationService,
+		*subscriberService,
+		*listService,
+		log,
+	)
 	if err := notificationAPI.Serve(); err != nil {
+		log.Error(ctx, err.Error())
 		return err
 	}
 

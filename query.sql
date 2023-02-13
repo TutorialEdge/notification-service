@@ -4,8 +4,10 @@ WHERE list_id = $1 LIMIT 1;
 
 -- name: CreateList :one
 INSERT INTO list (
+    list_id,
     list_name
 ) VALUES (
+    gen_random_uuid(),
     $1   
 ) RETURNING *;
 
@@ -15,9 +17,11 @@ WHERE list_id = $1;
 
 -- name: CreateNotification :one
 INSERT INTO notifications (
+    notification_id,
     notification_name,
     html
 ) VALUES (
+    gen_random_uuid(),
     $1,
     $2
 ) RETURNING *;
@@ -42,7 +46,9 @@ WHERE subscriber_id = $1;
 
 -- name: CreateSubscriber :one
 INSERT INTO subscribers (
+    subscriber_id,
     email
 ) VALUES (
+    gen_random_uuid(),
     $1
 ) RETURNING *;

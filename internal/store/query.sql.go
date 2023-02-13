@@ -14,8 +14,10 @@ import (
 
 const createList = `-- name: CreateList :one
 INSERT INTO list (
+    list_id,
     list_name
 ) VALUES (
+    gen_random_uuid(),
     $1   
 ) RETURNING list_id, list_name
 `
@@ -29,9 +31,11 @@ func (q *Queries) CreateList(ctx context.Context, listName string) (List, error)
 
 const createNotification = `-- name: CreateNotification :one
 INSERT INTO notifications (
+    notification_id,
     notification_name,
     html
 ) VALUES (
+    gen_random_uuid(),
     $1,
     $2
 ) RETURNING notification_id, notification_name, html
@@ -51,8 +55,10 @@ func (q *Queries) CreateNotification(ctx context.Context, arg CreateNotification
 
 const createSubscriber = `-- name: CreateSubscriber :one
 INSERT INTO subscribers (
+    subscriber_id,
     email
 ) VALUES (
+    gen_random_uuid(),
     $1
 ) RETURNING subscriber_id, email, is_subscribed
 `

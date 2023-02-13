@@ -1,8 +1,10 @@
 package api
 
 import (
+	"context"
 	"net/http"
 
+	"github.com/TutorialEdge/ctxlog"
 	"github.com/TutorialEdge/notification-service/internal/list"
 	"github.com/TutorialEdge/notification-service/internal/notification"
 	"github.com/TutorialEdge/notification-service/internal/subscriber"
@@ -14,17 +16,21 @@ type Handler struct {
 	notificationService notification.Notifier
 	subService          subscriber.Service
 	listService         list.Service
+	log                 *ctxlog.CtxLogger
 }
 
 func New(
 	notifier notification.Notifier,
 	subService subscriber.Service,
 	listService list.Service,
+	log *ctxlog.CtxLogger,
 ) *Handler {
+	log.Info(context.Background(), "hello world")
 	handler := &Handler{
 		notificationService: notifier,
 		subService:          subService,
 		listService:         listService,
+		log:                 log,
 	}
 	handler.setupRoutes()
 	return handler
