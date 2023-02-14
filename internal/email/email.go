@@ -31,7 +31,7 @@ func (s *Service) SendEmail(ctx context.Context, html string) error {
 	defer cancel()
 
 	m := s.mg.NewMessage(
-		"hello <support@myepitaph.com>",
+		"hello <support@myemail.com>",
 		"Hello",
 		"Testing some Mailgun awesomeness!",
 		"YOU@YOUR_DOMAIN_NAME",

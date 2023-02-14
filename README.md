@@ -11,6 +11,9 @@ This service is designed to do 2 things:
 To run the service, you will need `docker` up and running on your machine as well as the `Taskfile` tool:
 
 ```bash
+$ export MAILGUN_DOMAIN=yourdomain.com
+$ export MAILGUN_API_KEY=mailgun-api-key
+
 $ task run
 ```
 
