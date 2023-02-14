@@ -22,6 +22,13 @@ func TestSubscriptions(t *testing.T) {
 		fmt.Println(resp)
 	})
 
+	t.Run("can fetch all subscribers", func(t *testing.T) {
+		resp, err := client.R().
+			Get(BASE_URL + "/api/v1/subscribers")
+		assert.Nil(t, err)
+		fmt.Println(resp)
+	})
+
 	t.Run("Unsubscribe a subscriber", func(t *testing.T) {
 		resp, err := client.R().
 			SetBody(`{"email":"subscriber@test.com"}`).

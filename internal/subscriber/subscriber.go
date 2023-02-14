@@ -2,9 +2,9 @@ package subscriber
 
 import (
 	"context"
-	"errors"
 
 	"github.com/TutorialEdge/notification-service/internal/store"
+	"github.com/google/uuid"
 )
 
 type Subscriber struct {
@@ -15,6 +15,8 @@ type Subscriber struct {
 
 type Store interface {
 	CreateSubscriber(context.Context, string) (store.Subscriber, error)
+	GetSubscribers(context.Context, int32) ([]store.Subscriber, error)
+	GetSubscriber(context.Context, uuid.UUID) (store.Subscriber, error)
 	Unsubscribe(context.Context, string) error
 }
 
@@ -28,8 +30,44 @@ func New(store Store) *Service {
 	}
 }
 
+type PaginatedResponse struct {
+	Page  int32
+	Limit int32
+	Data  []Subscriber
+}
+
+func (s *Service) GetSubscribers(ctx context.Context, limit, page int32) (PaginatedResponse, error) {
+	subs, err := s.Store.GetSubscribers(ctx, limit)
+	if err != nil {
+		return PaginatedResponse{}, err
+	}
+
+	var normalizedSubs []Subscriber
+	for _, sub := range subs {
+		normalizedSubs = append(normalizedSubs, Subscriber{
+			SubscriberID: sub.SubscriberID.String(),
+			Email:        sub.Email,
+			Subscribed:   sub.IsSubscribed.Bool,
+		})
+	}
+
+	return PaginatedResponse{
+		Page:  page,
+		Limit: limit,
+		Data:  normalizedSubs,
+	}, nil
+}
+
 func (s *Service) GetSubscriber(ctx context.Context, subID string) (Subscriber, error) {
-	return Subscriber{}, errors.New("not implemented")
+	sub, err := s.Store.GetSubscriber(ctx, uuid.MustParse(subID))
+	if err != nil {
+		return Subscriber{}, err
+	}
+	return Subscriber{
+		SubscriberID: sub.SubscriberID.String(),
+		Email:        sub.Email,
+		Subscribed:   sub.IsSubscribed.Bool,
+	}, nil
 }
 
 func (s *Service) CreateSubscriber(ctx context.Context, sub Subscriber) (Subscriber, error) {
@@ -38,7 +76,9 @@ func (s *Service) CreateSubscriber(ctx context.Context, sub Subscriber) (Subscri
 		return Subscriber{}, err
 	}
 	return Subscriber{
-		Email: newSub.Email,
+		SubscriberID: newSub.SubscriberID.String(),
+		Email:        newSub.Email,
+		Subscribed:   newSub.IsSubscribed.Bool,
 	}, nil
 }
 

@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/TutorialEdge/ctxlog"
 	"github.com/TutorialEdge/notification-service/internal/subscriber"
@@ -64,9 +65,40 @@ func (h *Handler) Unsubscribe(c *gin.Context) {
 }
 
 func (h *Handler) GetSubscriber(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "one subscriber"})
+	ctx := c.Request.Context()
+	h.log.Info(ctx, "fetching single subscriber")
+
+	subID := c.Param("subscriberid")
+
+	sub, err := h.subService.GetSubscriber(ctx, subID)
+	if err != nil {
+		h.log.Error(ctx, err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "failed to fetch subscriber",
+			"error":   err.Error(),
+			"status":  http.StatusInternalServerError,
+		})
+	}
+
+	c.JSON(http.StatusOK, sub)
 }
 
 func (h *Handler) GetSubscribers(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "all subscribers"})
+	ctx := c.Request.Context()
+	h.log.Info(ctx, "fetching paginated subscribers")
+
+	limit, _ := strconv.Atoi(c.Query("limit"))
+	page, _ := strconv.Atoi(c.Query("page"))
+
+	subs, err := h.subService.GetSubscribers(ctx, int32(limit), int32(page))
+	if err != nil {
+		h.log.Error(ctx, err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "failed to fetch subscribers",
+			"error":   err.Error(),
+			"status":  http.StatusInternalServerError,
+		})
+	}
+
+	c.JSON(http.StatusOK, subs)
 }

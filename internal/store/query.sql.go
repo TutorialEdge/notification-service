@@ -114,16 +114,44 @@ func (q *Queries) GetNotification(ctx context.Context, notificationID uuid.UUID)
 	return i, err
 }
 
-const getSusbcriber = `-- name: GetSusbcriber :one
+const getSubscriber = `-- name: GetSubscriber :one
 SELECT subscriber_id, email, is_subscribed FROM subscribers
 WHERE subscriber_id = $1
 `
 
-func (q *Queries) GetSusbcriber(ctx context.Context, subscriberID uuid.UUID) (Subscriber, error) {
-	row := q.db.QueryRowContext(ctx, getSusbcriber, subscriberID)
+func (q *Queries) GetSubscriber(ctx context.Context, subscriberID uuid.UUID) (Subscriber, error) {
+	row := q.db.QueryRowContext(ctx, getSubscriber, subscriberID)
 	var i Subscriber
 	err := row.Scan(&i.SubscriberID, &i.Email, &i.IsSubscribed)
 	return i, err
+}
+
+const getSubscribers = `-- name: GetSubscribers :many
+SELECT subscriber_id, email, is_subscribed FROM subscribers
+LIMIT $1
+`
+
+func (q *Queries) GetSubscribers(ctx context.Context, limit int32) ([]Subscriber, error) {
+	rows, err := q.db.QueryContext(ctx, getSubscribers, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Subscriber
+	for rows.Next() {
+		var i Subscriber
+		if err := rows.Scan(&i.SubscriberID, &i.Email, &i.IsSubscribed); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const unsubscribe = `-- name: Unsubscribe :exec
