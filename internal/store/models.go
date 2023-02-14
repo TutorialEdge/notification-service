@@ -11,18 +11,27 @@ import (
 )
 
 type List struct {
-	ListID   uuid.UUID
-	ListName string
+	ListID    uuid.UUID
+	ListName  string
+	CreatedAt sql.NullTime
+	UpdatedAt sql.NullTime
+	DeletedAt sql.NullTime
 }
 
 type Notification struct {
 	NotificationID   uuid.UUID
 	NotificationName sql.NullString
 	Html             sql.NullString
+	CreatedAt        sql.NullTime
+	UpdatedAt        sql.NullTime
+	DeletedAt        sql.NullTime
 }
 
 type Subscriber struct {
 	SubscriberID uuid.UUID
 	Email        string
 	IsSubscribed sql.NullBool
+	CreatedAt    sql.NullTime
+	UpdatedAt    sql.NullTime
+	DeletedAt    sql.NullTime
 }

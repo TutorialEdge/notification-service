@@ -19,13 +19,19 @@ INSERT INTO list (
 ) VALUES (
     gen_random_uuid(),
     $1   
-) RETURNING list_id, list_name
+) RETURNING list_id, list_name, created_at, updated_at, deleted_at
 `
 
 func (q *Queries) CreateList(ctx context.Context, listName string) (List, error) {
 	row := q.db.QueryRowContext(ctx, createList, listName)
 	var i List
-	err := row.Scan(&i.ListID, &i.ListName)
+	err := row.Scan(
+		&i.ListID,
+		&i.ListName,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
 	return i, err
 }
 
@@ -38,7 +44,7 @@ INSERT INTO notifications (
     gen_random_uuid(),
     $1,
     $2
-) RETURNING notification_id, notification_name, html
+) RETURNING notification_id, notification_name, html, created_at, updated_at, deleted_at
 `
 
 type CreateNotificationParams struct {
@@ -49,7 +55,14 @@ type CreateNotificationParams struct {
 func (q *Queries) CreateNotification(ctx context.Context, arg CreateNotificationParams) (Notification, error) {
 	row := q.db.QueryRowContext(ctx, createNotification, arg.NotificationName, arg.Html)
 	var i Notification
-	err := row.Scan(&i.NotificationID, &i.NotificationName, &i.Html)
+	err := row.Scan(
+		&i.NotificationID,
+		&i.NotificationName,
+		&i.Html,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
 	return i, err
 }
 
@@ -60,13 +73,20 @@ INSERT INTO subscribers (
 ) VALUES (
     gen_random_uuid(),
     $1
-) RETURNING subscriber_id, email, is_subscribed
+) RETURNING subscriber_id, email, is_subscribed, created_at, updated_at, deleted_at
 `
 
 func (q *Queries) CreateSubscriber(ctx context.Context, email string) (Subscriber, error) {
 	row := q.db.QueryRowContext(ctx, createSubscriber, email)
 	var i Subscriber
-	err := row.Scan(&i.SubscriberID, &i.Email, &i.IsSubscribed)
+	err := row.Scan(
+		&i.SubscriberID,
+		&i.Email,
+		&i.IsSubscribed,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
 	return i, err
 }
 
@@ -91,43 +111,63 @@ func (q *Queries) DeleteNotification(ctx context.Context, notificationID uuid.UU
 }
 
 const getList = `-- name: GetList :one
-SELECT list_id, list_name FROM list
+SELECT list_id, list_name, created_at, updated_at, deleted_at FROM list
 WHERE list_id = $1 LIMIT 1
 `
 
 func (q *Queries) GetList(ctx context.Context, listID uuid.UUID) (List, error) {
 	row := q.db.QueryRowContext(ctx, getList, listID)
 	var i List
-	err := row.Scan(&i.ListID, &i.ListName)
+	err := row.Scan(
+		&i.ListID,
+		&i.ListName,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
 	return i, err
 }
 
 const getNotification = `-- name: GetNotification :one
-SELECT notification_id, notification_name, html FROM notifications
+SELECT notification_id, notification_name, html, created_at, updated_at, deleted_at FROM notifications
 WHERE notification_id = $1 LIMIT 1
 `
 
 func (q *Queries) GetNotification(ctx context.Context, notificationID uuid.UUID) (Notification, error) {
 	row := q.db.QueryRowContext(ctx, getNotification, notificationID)
 	var i Notification
-	err := row.Scan(&i.NotificationID, &i.NotificationName, &i.Html)
+	err := row.Scan(
+		&i.NotificationID,
+		&i.NotificationName,
+		&i.Html,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
 	return i, err
 }
 
 const getSubscriber = `-- name: GetSubscriber :one
-SELECT subscriber_id, email, is_subscribed FROM subscribers
+SELECT subscriber_id, email, is_subscribed, created_at, updated_at, deleted_at FROM subscribers
 WHERE subscriber_id = $1
 `
 
 func (q *Queries) GetSubscriber(ctx context.Context, subscriberID uuid.UUID) (Subscriber, error) {
 	row := q.db.QueryRowContext(ctx, getSubscriber, subscriberID)
 	var i Subscriber
-	err := row.Scan(&i.SubscriberID, &i.Email, &i.IsSubscribed)
+	err := row.Scan(
+		&i.SubscriberID,
+		&i.Email,
+		&i.IsSubscribed,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
 	return i, err
 }
 
 const getSubscribers = `-- name: GetSubscribers :many
-SELECT subscriber_id, email, is_subscribed FROM subscribers
+SELECT subscriber_id, email, is_subscribed, created_at, updated_at, deleted_at FROM subscribers
 LIMIT $1
 `
 
@@ -140,7 +180,14 @@ func (q *Queries) GetSubscribers(ctx context.Context, limit int32) ([]Subscriber
 	var items []Subscriber
 	for rows.Next() {
 		var i Subscriber
-		if err := rows.Scan(&i.SubscriberID, &i.Email, &i.IsSubscribed); err != nil {
+		if err := rows.Scan(
+			&i.SubscriberID,
+			&i.Email,
+			&i.IsSubscribed,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

@@ -50,11 +50,15 @@ func Run() error {
 	emailService := email.New()
 
 	listService := list.New()
-	subscriberService := subscriber.New(serviceStore)
+	subscriberService := subscriber.New(
+		serviceStore,
+		log,
+	)
 	notificationService := notification.New(
 		serviceStore,
 		emailService,
 		subscriberService,
+		log,
 	)
 	notificationAPI := api.New(
 		*notificationService,
