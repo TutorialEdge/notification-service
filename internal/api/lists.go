@@ -18,7 +18,7 @@ func (h *Handler) CreateList(c *gin.Context) {
 		})
 	}
 
-	createdList, err := h.listService.CreateList(c.Request.Context(), newList)
+	createdList, err := h.listService.CreateList(c.Request.Context(), newList.ListName)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "failed to create new list",

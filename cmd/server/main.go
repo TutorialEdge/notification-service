@@ -47,9 +47,12 @@ func Run() error {
 	}
 
 	serviceStore := store.New(db)
-	emailService := email.New()
+	emailService := email.New(log)
 
-	listService := list.New()
+	listService := list.New(
+		serviceStore,
+		log,
+	)
 	subscriberService := subscriber.New(
 		serviceStore,
 		log,
