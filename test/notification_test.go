@@ -19,14 +19,14 @@ func TestNotifications(t *testing.T) {
 	client := resty.New()
 	t.Run("create a new notification", func(t *testing.T) {
 		resp, err := client.R().
-			SetBody(`{"slug": "/", "author": "12345", "body": "hello world"}`).
+			SetBody(`{}`).
 			Post(BASE_URL + "/api/v1/notification")
 
 		assert.Nil(t, err)
 		fmt.Println(resp)
 
 		resp, err = client.R().
-			SetBody(`{"slug": "/", "author": "12345", "body": "hello world"}`).
+			SetBody(`{}`).
 			Get(BASE_URL + "/api/v1/notification/" + "uuid")
 
 		assert.Nil(t, err)
@@ -35,14 +35,14 @@ func TestNotifications(t *testing.T) {
 
 	t.Run("delete a notification", func(t *testing.T) {
 		resp, err := client.R().
-			SetBody(`{"slug": "/", "author": "12345", "body": "hello world"}`).
+			SetBody(`{}`).
 			Post(BASE_URL + "/api/v1/notification")
 
 		assert.Nil(t, err)
 		fmt.Println(resp)
 
 		resp, err = client.R().
-			SetBody(`{"slug": "/", "author": "12345", "body": "hello world"}`).
+			SetBody(`{}`).
 			Delete(BASE_URL + "/api/v1/notification/" + "todo")
 
 		assert.Nil(t, err)
@@ -52,14 +52,14 @@ func TestNotifications(t *testing.T) {
 
 	t.Run("update a notification", func(t *testing.T) {
 		resp, err := client.R().
-			SetBody(`{"slug": "/", "author": "12345", "body": "hello world"}`).
+			SetBody(`{}`).
 			Post(BASE_URL + "/api/v1/notification")
 
 		assert.Nil(t, err)
 		fmt.Println(resp)
 
 		resp, err = client.R().
-			SetBody(`{"slug": "/", "author": "12345", "body": "hello world"}`).
+			SetBody(`{}`).
 			Put(BASE_URL + "/api/v1/notification")
 
 		assert.Nil(t, err)

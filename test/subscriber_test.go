@@ -5,6 +5,7 @@ package test
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 
 	"github.com/go-resty/resty/v2"
@@ -19,14 +20,14 @@ func TestSubscriptions(t *testing.T) {
 			Post(BASE_URL + "/api/v1/subscribe")
 
 		assert.Nil(t, err)
-		fmt.Println(resp)
+		assert.Equal(t, http.StatusOK, resp.StatusCode())
 	})
 
 	t.Run("can fetch all subscribers", func(t *testing.T) {
 		resp, err := client.R().
 			Get(BASE_URL + "/api/v1/subscribers")
 		assert.Nil(t, err)
-		fmt.Println(resp)
+		assert.Equal(t, http.StatusOK, resp.StatusCode())
 	})
 
 	t.Run("Unsubscribe a subscriber", func(t *testing.T) {
@@ -35,13 +36,13 @@ func TestSubscriptions(t *testing.T) {
 			Post(BASE_URL + "/api/v1/subscribe")
 
 		assert.Nil(t, err)
-		fmt.Println(resp)
+		assert.Equal(t, http.StatusOK, resp.StatusCode())
 
 		resp, err = client.R().
 			Get(BASE_URL + "/api/v1/unsubscribe?email=subscriber@test.com")
 
 		assert.Nil(t, err)
-		fmt.Println(resp)
+		assert.Equal(t, http.StatusOK, resp.StatusCode())
 
 	})
 }
