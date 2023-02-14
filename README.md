@@ -27,3 +27,19 @@ $ task test
 
 # Running the acceptance tests - note: this requires the app to be running locally
 $ task acceptance-test
+```
+
+## Flow
+
+1. Create a List
+2. Create a subscriber
+3. Create a notification
+4. Send a notification with an email
+
+## TODO
+
+* The concept of a list needs to be fleshed out better. Currently subscribers aren't associated
+with a list - subscribers should belong to 1 or more different lists.
+* Notifications can then be sent to entire lists which could fetch all subscribers under a list
+and send all emails.
+* Notifications can also be sent to individual subscribers so we'll need that distinction.
